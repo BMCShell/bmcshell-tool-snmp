@@ -1,0 +1,194 @@
+{
+  "schema": 1,
+  "id": "6ad7023f-7be5-4c61-8c92-57af9e256dbf",
+  "type": "toolplugin",
+  "name": "BMCShell SNMP",
+  "summary": "管理当前 BMC 的 SNMP 配置，并提供 v1、v2c 和 v3 命令。",
+  "version": "1.0.0",
+  "coreApi": 1,
+  "platforms": [
+    "windows-amd64"
+  ],
+  "help": "help.json",
+  "changelog": "changelog.json",
+  "assets": [
+    "tool/compat/common.sh",
+    "tool/compat/snmp.sh"
+  ],
+  "provides": {
+    "tools": {
+      "snmp": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      },
+      "snmpget": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      },
+      "snmp2get": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      },
+      "snmp3get": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      },
+      "snmpgetnext": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      },
+      "snmp2getnext": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      },
+      "snmp3getnext": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      },
+      "snmpwalk": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      },
+      "snmp2walk": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      },
+      "snmp3walk": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      },
+      "snmpbulkwalk": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      },
+      "snmp2bulkwalk": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      },
+      "snmp3bulkwalk": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      },
+      "snmpbulkget": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      },
+      "snmp2bulkget": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      },
+      "snmp3bulkget": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      },
+      "snmpset": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      },
+      "snmp2set": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      },
+      "snmp3set": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      }
+    }
+  },
+  "systemDependencies": [
+    {
+      "id": "snmpget"
+    },
+    {
+      "id": "snmpgetnext"
+    },
+    {
+      "id": "snmpwalk"
+    },
+    {
+      "id": "snmpbulkwalk"
+    },
+    {
+      "id": "snmpbulkget"
+    },
+    {
+      "id": "snmpset"
+    }
+  ]
+}

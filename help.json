@@ -1,0 +1,98 @@
+{
+  "topics": {
+    "package": {
+      "summary": "管理当前 BMC 的 SNMP 配置，并提供 v1、v2c 和 v3 命令。",
+      "usage": [
+        "bmc use <IPv4>",
+        "bmc tool snmp"
+      ],
+      "examples": [
+        {
+          "command": "bmc tool snmp",
+          "description": "查看详细说明和示例。"
+        }
+      ],
+      "notes": [
+        "本工具遵循 BMCShell 的 SOCKS5 代理设置。"
+      ]
+    },
+    "tool.snmp": {
+      "summary": "查看、设置或清除当前会话的 SNMP 配置。",
+      "usage": [
+        "snmp [-s|--status]",
+        "snmp -c|--configure [1|2c]",
+        "snmp -r|--clear"
+      ],
+      "options": [],
+      "examples": [
+        {
+          "command": "snmp -s",
+          "description": "显示当前目标、默认版本和团体名配置状态。"
+        },
+        {
+          "command": "snmp -c 1",
+          "description": "为当前目标交互设置 SNMPv1 团体名。"
+        },
+        {
+          "command": "snmp -r",
+          "description": "清除会话团体名并恢复 2c 默认版本。"
+        }
+      ],
+      "notes": [
+        "会话团体名主要用于 v1，随目标切换和退出清除。",
+        "v2c 默认使用旧配置目录下的 credentials/snmp-v2c-read 或 credentials/snmp-v2c-write。每个文件保存一行。",
+        "v3 认证由调用者传入，详细示例见 bmc tool snmp3get。"
+      ]
+    },
+    "tool.snmp-query": {
+      "summary": "用 SNMPv1、v2c 或 v3 查询或修改当前设备。",
+      "usage": [
+        "snmp2get|getnext|walk|bulkwalk|bulkget [原生选项] <OID...>",
+        "snmp2set [原生选项] <OID> <类型> <值>",
+        "snmp3get|getnext|walk|bulkwalk|bulkget [认证参数] <OID...>",
+        "snmp3set [认证参数] <OID> <类型> <值>",
+        "snmpget|snmpgetnext|snmpwalk|snmpbulkwalk|snmpbulkget|snmpset [原生选项] <参数...>"
+      ],
+      "options": [],
+      "examples": [
+        {
+          "command": "snmp2get .1.3.6.1.2.1.1.1.0",
+          "description": "读取 sysDescr。"
+        },
+        {
+          "command": "snmp2walk .1.3.6.1.2.1.1",
+          "description": "遍历 system 子树。"
+        },
+        {
+          "command": "snmp3get -u USER -l authPriv -a SHA -A AUTH_PASS -x AES -X PRIV_PASS .1.3.6.1.2.1.1.1.0",
+          "description": "按需提供独立的 v3 认证参数。"
+        }
+      ],
+      "notes": [
+        "snmp2* 固定 v2c，snmp3* 固定 v3。原生命令名的包装可用 -v 选择版本。",
+        "自动补当前 BMC 作为目标。v2c 的只读和写入使用不同私有文件。v1 使用会话团体名。",
+        "显式 -c 可为单次 v1 或 v2c 调用指定团体名。写入需提供 OID、类型和值。"
+      ]
+    }
+  },
+  "aliases": {
+    "tool.snmpget": "tool.snmp-query",
+    "tool.snmp2get": "tool.snmp-query",
+    "tool.snmp3get": "tool.snmp-query",
+    "tool.snmpgetnext": "tool.snmp-query",
+    "tool.snmp2getnext": "tool.snmp-query",
+    "tool.snmp3getnext": "tool.snmp-query",
+    "tool.snmpwalk": "tool.snmp-query",
+    "tool.snmp2walk": "tool.snmp-query",
+    "tool.snmp3walk": "tool.snmp-query",
+    "tool.snmpbulkwalk": "tool.snmp-query",
+    "tool.snmp2bulkwalk": "tool.snmp-query",
+    "tool.snmp3bulkwalk": "tool.snmp-query",
+    "tool.snmpbulkget": "tool.snmp-query",
+    "tool.snmp2bulkget": "tool.snmp-query",
+    "tool.snmp3bulkget": "tool.snmp-query",
+    "tool.snmpset": "tool.snmp-query",
+    "tool.snmp2set": "tool.snmp-query",
+    "tool.snmp3set": "tool.snmp-query"
+  }
+}
