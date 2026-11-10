@@ -2,9 +2,14 @@
   "schema": 1,
   "id": "6ad7023f-7be5-4c61-8c92-57af9e256dbf",
   "type": "toolplugin",
-  "name": "BMCShell SNMP",
+  "publisher": "bmcshell",
+  "shortName": "snmp",
+  "name": "bmcshell-tool-snmp",
+  "displayName": "BMCShell SNMP",
+  "description": "管理当前 BMC 的 SNMP 配置，并提供 v1、v2c 和 v3 命令。",
   "summary": "管理当前 BMC 的 SNMP 配置，并提供 v1、v2c 和 v3 命令。",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "repository": "https://github.com/BMCShell/bmcshell-tool-snmp",
   "coreApi": 1,
   "platforms": [
     "windows-amd64"
