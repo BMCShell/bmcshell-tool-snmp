@@ -8,7 +8,7 @@
   "displayName": "BMCShell SNMP",
   "description": "管理当前 BMC 的 SNMP 配置，并提供 v1、v2c 和 v3 命令。",
   "summary": "管理当前 BMC 的 SNMP 配置，并提供 v1、v2c 和 v3 命令。",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "repository": "https://github.com/BMCShell/bmcshell-tool-snmp",
   "coreApi": 1,
   "platforms": [

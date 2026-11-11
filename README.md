@@ -6,9 +6,9 @@
 
 ```bash
 bmc plugin install --file .
-bmc help tool snmp --usage
+bmc tool snmp --help
 bmc use 192.0.2.10
-bmc tool snmp
+snmp --help
 ```
 
 工具随目标会话激活。系统依赖为 `snmpget`、`snmpgetnext`、`snmpwalk`、`snmpbulkwalk`、`snmpbulkget`、`snmpset`。代理由 `bmc proxy` 管理。发布时在本仓运行 `pwsh -File ./scripts/pack-release.ps1`，输出 `bmcshell-tool-snmp@<version>.zip` 和 SHA256 清单。

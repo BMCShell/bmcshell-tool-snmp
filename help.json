@@ -1,77 +1,110 @@
 {
   "topics": {
     "package": {
-      "summary": "管理当前 BMC 的 SNMP 配置，并提供 v1、v2c 和 v3 命令。",
+      "summary": "配置当前会话的 SNMP 参数，并通过 Net-SNMP 查询或修改 BMC。",
       "usage": [
         "bmc use <IPv4>",
-        "bmc tool snmp"
+        "bmc tool snmp --help",
+        "bmc tool snmp2get --help"
       ],
       "examples": [
         {
-          "command": "bmc tool snmp",
-          "description": "查看详细说明和示例。"
+          "command": "snmp -s",
+          "description": "选中目标后检查会话的 SNMP 配置。"
         }
       ],
       "notes": [
-        "本工具遵循 BMCShell 的 SOCKS5 代理设置。"
+        "需要 PATH 中的对应 Net-SNMP 命令。代理由 bmc proxy 管理。"
       ]
     },
     "tool.snmp": {
-      "summary": "查看、设置或清除当前会话的 SNMP 配置。",
+      "summary": "查看、设置或清除当前 BMC 会话的 SNMP 配置。",
       "usage": [
         "snmp [-s|--status]",
         "snmp -c|--configure [1|2c]",
         "snmp -r|--clear"
       ],
-      "options": [],
+      "options": [
+        {
+          "name": "-s, --status",
+          "description": "显示目标 IP、默认版本和团体名配置状态。",
+          "default": "查看状态"
+        },
+        {
+          "name": "-c, --configure [1|2c]",
+          "description": "交互输入团体名，并选择原生命令包装的默认 SNMP 版本。",
+          "default": "2c"
+        },
+        {
+          "name": "-r, --clear",
+          "description": "清除会话团体名，恢复默认版本 2c。"
+        }
+      ],
       "examples": [
         {
           "command": "snmp -s",
-          "description": "显示当前目标、默认版本和团体名配置状态。"
+          "description": "查看会话 SNMP 状态。"
         },
         {
           "command": "snmp -c 1",
-          "description": "为当前目标交互设置 SNMPv1 团体名。"
+          "description": "将默认版本设为 SNMPv1，并输入当前会话的团体名。"
         },
         {
           "command": "snmp -r",
-          "description": "清除会话团体名并恢复 2c 默认版本。"
+          "description": "清除会话配置。"
         }
       ],
       "notes": [
-        "会话团体名主要用于 v1，随目标切换和退出清除。",
-        "v2c 默认使用旧配置目录下的 credentials/snmp-v2c-read 或 credentials/snmp-v2c-write。每个文件保存一行。",
-        "v3 认证由调用者传入，详细示例见 bmc tool snmp3get。"
+        "会话团体名用于 v1，在切换目标或退出后清除。v2c 默认从只读或写入凭据文件取值，也可在查询或写入时显式提供 -c。v3 认证参数由调用者每次传入。"
       ]
     },
     "tool.snmp-query": {
-      "summary": "用 SNMPv1、v2c 或 v3 查询或修改当前设备。",
+      "summary": "通过当前 BMC 会话执行 SNMP 查询、遍历或写入。",
       "usage": [
-        "snmp2get|getnext|walk|bulkwalk|bulkget [原生选项] <OID...>",
-        "snmp2set [原生选项] <OID> <类型> <值>",
-        "snmp3get|getnext|walk|bulkwalk|bulkget [认证参数] <OID...>",
-        "snmp3set [认证参数] <OID> <类型> <值>",
-        "snmpget|snmpgetnext|snmpwalk|snmpbulkwalk|snmpbulkget|snmpset [原生选项] <参数...>"
+        "snmpget|snmp2get|snmp3get [选项] <OID> [OID...]",
+        "snmpgetnext|snmp2getnext|snmp3getnext [选项] <OID> [OID...]",
+        "snmpwalk|snmp2walk|snmp3walk [选项] [OID...]",
+        "snmpbulkwalk|snmp2bulkwalk|snmp3bulkwalk [选项] [OID...]",
+        "snmpbulkget|snmp2bulkget|snmp3bulkget [选项] <OID> [OID...]",
+        "snmpset|snmp2set|snmp3set [选项] <OID> <类型> <值> [OID 类型 值...]"
       ],
-      "options": [],
+      "options": [
+        {
+          "name": "-v <1|2c|3>",
+          "description": "为 snmpget 等未带版本的入口选择协议。snmp2* 固定使用 v2c，snmp3* 固定使用 v3。",
+          "default": "当前会话的版本，初始为 2c"
+        },
+        {
+          "name": "-c <团体名>",
+          "description": "为本次 v1 或 v2c 调用指定团体名。"
+        },
+        {
+          "name": "-u <用户名>, -l <安全级别>",
+          "description": "指定 v3 的用户名和安全级别。按级别提供原生认证与加密选项。"
+        },
+        {
+          "name": "-h",
+          "description": "查看原生 Net-SNMP 命令帮助。"
+        }
+      ],
       "examples": [
         {
           "command": "snmp2get .1.3.6.1.2.1.1.1.0",
-          "description": "读取 sysDescr。"
+          "description": "使用 SNMPv2c 读取 sysDescr。"
         },
         {
           "command": "snmp2walk .1.3.6.1.2.1.1",
           "description": "遍历 system 子树。"
         },
         {
-          "command": "snmp3get -u USER -l authPriv -a SHA -A AUTH_PASS -x AES -X PRIV_PASS .1.3.6.1.2.1.1.1.0",
-          "description": "按需提供独立的 v3 认证参数。"
+          "command": "snmp3get -u operator -l noAuthNoPriv .1.3.6.1.2.1.1.1.0",
+          "description": "用配置为 noAuthNoPriv 的 SNMPv3 用户读取 sysDescr。请使用设备已配置的用户和安全级别。"
         }
       ],
       "notes": [
-        "snmp2* 固定 v2c，snmp3* 固定 v3。原生命令名的包装可用 -v 选择版本。",
-        "自动补当前 BMC 作为目标。v2c 的只读和写入使用不同私有文件。v1 使用会话团体名。",
-        "显式 -c 可为单次 v1 或 v2c 调用指定团体名。写入需提供 OID、类型和值。"
+        "目标 IP 自动取自当前会话。只需传入选项和 OID，写入时按组传入 OID、类型和值。",
+        "v1 可使用会话团体名。v2c 默认读取配置目录下的 credentials/snmp-v2c-read 或 credentials/snmp-v2c-write，每个文件保存一行。",
+        "命令输出由原生 Net-SNMP 提供。需要独立指定目标时，可使用 command 调用原生程序。"
       ]
     }
   },

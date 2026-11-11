@@ -30,7 +30,7 @@ _bmc_snmp_activate() {
     for tool in snmpget snmpgetnext snmpwalk snmpbulkwalk snmpbulkget snmpset; do unalias "$tool" 2>/dev/null || :; done
     if ! _bmc_snmp_install_functions; then
         _bmc_snmp_restore
-        _bmc_error 'Could not install SNMP wrappers; previous definitions restored.'; return 2
+        _bmc_error '无法安装 SNMP 命令包装，已恢复先前的命令定义。'; return 2
     fi
     _BMC_SNMP_COMMUNITY=''; export -n _BMC_SNMP_COMMUNITY 2>/dev/null
     _BMC_SNMP_VERSION=2c
@@ -63,13 +63,13 @@ _bmc_snmp_restore() {
 
 _bmc_snmp_read_community() {
     local +x community=''
-    [[ -r /dev/tty && -w /dev/tty ]] || { _bmc_error 'SNMP community requires an interactive terminal, or supply -c explicitly.'; return 2; }
-    if ! IFS= read -r -s -p 'SNMP community (separate from the BMC login password): ' community </dev/tty; then
+    [[ -r /dev/tty && -w /dev/tty ]] || { _bmc_error '请输入 SNMP 团体名。非交互调用可给查询或写入命令指定 -c。'; return 2; }
+    if ! IFS= read -r -s -p '请输入 SNMP 团体名（独立于 BMC 登录密码）：' community </dev/tty; then
         printf '\n' >/dev/tty; return 130
     fi
     printf '\n' >/dev/tty
     [[ -n $community && ${#community} -le 4096 && $community != *[[:cntrl:]]* ]] || {
-        _bmc_error 'Community must be nonempty, at most 4096 characters, without control characters.'; return 2;
+        _bmc_error '请输入 1 至 4096 个字符的团体名，且不能包含控制字符。'; return 2;
     }
     export -n _BMC_SNMP_COMMUNITY 2>/dev/null
     _BMC_SNMP_COMMUNITY=$community
@@ -82,21 +82,21 @@ _bmc_snmp_command() {
     case $action in
         -h|--help) (( $# == 1 )) || return 2; _bmc_tool snmp ;;
         -s|--status)
-            (( $# <= 1 )) || { _bmc_error 'Use: snmp [-s|-c [1|2c]|-r]'; return 2; }
-            printf 'SNMP target: %s (UDP/161)\nDefault version: %s\nSession community: %s\n' "$_BMC_IP" "${_BMC_SNMP_VERSION:-2c}" "$(if [[ -n ${_BMC_SNMP_COMMUNITY-} ]]; then printf 'configured'; else printf 'not configured'; fi)"
+            (( $# <= 1 )) || { _bmc_error 'SNMP 会话选项无效。请运行 snmp --help 查看用法。'; return 2; }
+            printf 'SNMP 目标：%s（UDP/161）\n默认版本：%s\n会话团体名：%s\n' "$_BMC_IP" "${_BMC_SNMP_VERSION:-2c}" "$(if [[ -n ${_BMC_SNMP_COMMUNITY-} ]]; then printf '已配置'; else printf '未配置'; fi)"
             ;;
         -c|--configure)
-            (( $# <= 2 )) && [[ $version == 1 || $version == 2c ]] || { _bmc_error 'Use: snmp -c [1|2c]; for SNMPv3 supply native -v3 authentication options per call.'; return 2; }
+            (( $# <= 2 )) && [[ $version == 1 || $version == 2c ]] || { _bmc_error 'snmp -c 仅接受版本 1 或 2c。SNMPv3 的认证参数需在每次调用时传入。'; return 2; }
             _bmc_snmp_read_community || return
             _BMC_SNMP_VERSION=$version
-            printf 'SNMPv%s community configured for %s (current BMC session only).\n' "$version" "$_BMC_IP"
+            printf '已配置 SNMPv%s 团体名，目标为 %s，仅在当前 BMC 会话中生效。\n' "$version" "$_BMC_IP"
             ;;
         -r|--clear)
-            (( $# == 1 )) || { _bmc_error 'Use: snmp -r'; return 2; }
+            (( $# == 1 )) || { _bmc_error 'snmp -r 无需附加参数。'; return 2; }
             _BMC_SNMP_COMMUNITY=''; _BMC_SNMP_VERSION=2c
-            printf 'Current SNMP community cleared.\n'
+            printf '已清除当前会话的 SNMP 团体名，默认版本恢复为 2c。\n'
             ;;
-        *) _bmc_error 'Use: snmp [-s|-c [1|2c]|-r]'; return 2 ;;
+        *) _bmc_error 'SNMP 会话选项无效。请运行 snmp --help 查看用法。'; return 2 ;;
     esac
 }
 
@@ -115,7 +115,7 @@ _bmc_snmp_wrapper() {
     local -a opts=() native=() operands=()
     shift
     case $tool in snmpget|snmpgetnext|snmpwalk|snmpbulkwalk|snmpbulkget|snmpset) ;; *) return 2;; esac
-    type -P "$tool" >/dev/null 2>&1 || { _bmc_error "$tool executable is not installed."; return 69; }
+    type -P "$tool" >/dev/null 2>&1 || { _bmc_error "找不到 $tool。请运行 bmc doctor -d 查看安装提示。"; return 69; }
     if (( $# == 1 )); then
         case $1 in -h|--help|-H|-V|--version) _bmc_show_command command "$tool" "$1"; command "$tool" "$1"; return $?;; esac
     fi
@@ -123,7 +123,7 @@ _bmc_snmp_wrapper() {
         case $1 in
             --) shift; break ;;
             -v|-c)
-                (( $# >= 2 )) || { _bmc_error 'Missing SNMP option value.'; return 2; }
+                (( $# >= 2 )) || { _bmc_error "SNMP 选项 $1 缺少值。"; return 2; }
                 option=$1; value=$2; shift 2
                 if [[ $option == -v ]]; then version=$value; else community=$value; have_community=1; fi
                 ;;
@@ -131,59 +131,59 @@ _bmc_snmp_wrapper() {
             -c?*) community=${1#-c}; have_community=1; shift ;;
             -d) native+=("$1"); shift ;;
             -CE|-Is|-IS)
-                (( $# >= 2 )) || { _bmc_error 'Missing SNMP extended option value.'; return 2; }
+                (( $# >= 2 )) || { _bmc_error "SNMP 扩展选项 $1 缺少参数。"; return 2; }
                 native+=("$1" "$2"); shift 2
                 ;;
             -C|-I)
-                (( $# >= 2 )) || { _bmc_error 'Missing SNMP option value.'; return 2; }
+                (( $# >= 2 )) || { _bmc_error "SNMP 选项 $1 缺少值。"; return 2; }
                 option=$1; value=$2
                 if [[ $option == -C && $value == E || $option == -I && ( $value == s || $value == S ) ]]; then
-                    (( $# >= 3 )) || { _bmc_error 'Missing SNMP extended option value.'; return 2; }
+                    (( $# >= 3 )) || { _bmc_error "SNMP 扩展选项 $1 缺少参数。"; return 2; }
                     native+=("$1" "$2" "$3"); shift 3
                 elif [[ $option == -C && $value == *E* || $option == -I && ( $value == *s* || $value == *S* ) ]]; then
-                    _bmc_error 'Use the separate -CE/-Is/-IS option form for options with an extra argument.'; return 2
+                    _bmc_error '请将 -CE、-Is 或 -IS 与其附加参数分开书写。'; return 2
                 else native+=("$1" "$2"); shift 2; fi
                 ;;
             -r|-t|-m|-M|-n|-u|-l|-a|-A|-x|-X|-e|-E|-Z|-D|-O|-P|-3m|-3M|-3k|-3K)
-                (( $# >= 2 )) || { _bmc_error 'Missing SNMP option value.'; return 2; }
+                (( $# >= 2 )) || { _bmc_error "SNMP 选项 $1 缺少值。"; return 2; }
                 native+=("$1" "$2"); shift 2
                 ;;
             -C?*|-I?*)
                 value=${1:2}
                 if [[ $1 == -C* && $value == *E* || $1 == -I* && ( $value == *s* || $value == *S* ) ]]; then
-                    _bmc_error 'Use the separate -CE/-Is/-IS option form for options with an extra argument.'; return 2
+                    _bmc_error '请将 -CE、-Is 或 -IS 与其附加参数分开书写。'; return 2
                 fi
                 native+=("$1"); shift
                 ;;
             -r?*|-t?*|-m?*|-M?*|-n?*|-u?*|-l?*|-a?*|-A?*|-x?*|-X?*|-e?*|-E?*|-Z?*|-D?*|-O?*|-P?*|-3m?*|-3M?*|-3k?*|-3K?*)
                 native+=("$1"); shift
                 ;;
-            -*) _bmc_error 'Unsupported SNMP option form. Use command snmpget (or the native tool) for an independent connection.'; return 2 ;;
+            -*) _bmc_error '此工具不支持该 SNMP 选项写法。需要独立连接时可使用 command 调用原生 SNMP 命令。'; return 2 ;;
             *) break ;;
         esac
     done
     version=${_bmc_forced_version:-$version}
-    [[ $version == 1 || $version == 2c || $version == 3 ]] || { _bmc_error 'SNMP version must be 1, 2c or 3.'; return 2; }
+    [[ $version == 1 || $version == 2c || $version == 3 ]] || { _bmc_error 'SNMP 版本必须为 1、2c 或 3。'; return 2; }
     operands=("$@")
     if [[ $tool == snmpset ]]; then
-        (( $# >= 3 && $# % 3 == 0 )) || { _bmc_error 'Use: snmpset [options] OID TYPE VALUE [OID TYPE VALUE...] (target IP is automatic).'; return 2; }
+        (( $# >= 3 && $# % 3 == 0 )) || { _bmc_error '请为 snmpset 提供一组或多组 <OID> <类型> <值>，目标 IP 使用当前会话。'; return 2; }
         for ((i=0; i<${#operands[@]}; i+=3)); do
             _bmc_snmp_oid_valid "${operands[i]}" && [[ ${operands[i+1]} =~ ^[iusxdnotabUIFD=]$ ]] || {
-                _bmc_error 'Invalid SNMPset OID/type. Supply only OID TYPE VALUE operands; target IP is automatic.'; return 2;
+                _bmc_error 'SNMP 写入的 OID 或类型无效。请使用 <OID> <类型> <值> 格式，目标 IP 使用当前会话。'; return 2;
             }
         done
     else
         if [[ $tool != snmpwalk && $tool != snmpbulkwalk ]] && (( $# == 0 )); then
-            _bmc_error 'At least one OID is required; target IP is automatic.'; return 2
+            _bmc_error '请提供至少一个 OID，目标 IP 使用当前会话。'; return 2
         fi
-        for value in "$@"; do _bmc_snmp_oid_valid "$value" || { _bmc_error 'Invalid OID or an explicit target was supplied; target IP is automatic.'; return 2; }; done
+        for value in "$@"; do _bmc_snmp_oid_valid "$value" || { _bmc_error 'OID 无效或传入了额外的目标地址。目标 IP 使用当前会话。'; return 2; }; done
     fi
     opts=(-v "$version")
     # Keep read and write defaults separate and outside the release.
     if [[ $version == 2c ]] && (( have_community == 0 )); then
         store=$(_bmc_config_dir)/credentials/snmp-v2c-read
         [[ $tool == snmpset ]] && store=$(_bmc_config_dir)/credentials/snmp-v2c-write
-        if [[ ! -r $store ]]; then _bmc_error "Configure the SNMPv2c community in $store or supply -c."; return 69; fi
+        if [[ ! -r $store ]]; then _bmc_error "请在 $store 中配置 SNMPv2c 团体名，或使用 -c 指定本次调用的团体名。"; return 69; fi
         IFS= read -r community < "$store" || [[ -n $community ]] || return 2
         community=${community%$'\r'}
         have_community=1
@@ -194,10 +194,10 @@ _bmc_snmp_wrapper() {
             community=$_BMC_SNMP_COMMUNITY
         fi
         [[ -n $community && ${#community} -le 4096 && $community != *[[:cntrl:]]* ]] || {
-            _bmc_error 'Invalid SNMP community.'; return 2;
+            _bmc_error 'SNMP 团体名无效。请输入 1 至 4096 个字符，且不能包含控制字符。'; return 2;
         }
         opts+=(-c "$community")
-    elif (( have_community )); then _bmc_error '-c applies to SNMPv1/v2c; use SNMPv3 native authentication options.'; return 2; fi
+    elif (( have_community )); then _bmc_error '-c 适用于 SNMPv1 和 v2c。请使用 SNMPv3 的原生认证选项。'; return 2; fi
     opts+=("${native[@]}")
     # -- ends option parsing before the AGENT and protects values beginning '-'.
     proxy_address=$(_bmcshell_bridge proxy-address) || return
