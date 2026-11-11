@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "suggestions": [
+    {
+      "dependency": "snmpget",
+      "suggestion": "请安装适用于当前 Windows 终端的 Net-SNMP 命令行工具，并将包含 SNMP 命令的目录加入当前终端的 PATH。",
+      "platform": "windows-amd64"
+    },
+    {
+      "dependency": "snmpgetnext",
+      "suggestion": "请安装适用于当前 Windows 终端的 Net-SNMP 命令行工具，并将包含 SNMP 命令的目录加入当前终端的 PATH。",
+      "platform": "windows-amd64"
+    },
+    {
+      "dependency": "snmpwalk",
+      "suggestion": "请安装适用于当前 Windows 终端的 Net-SNMP 命令行工具，并将包含 SNMP 命令的目录加入当前终端的 PATH。",
+      "platform": "windows-amd64"
+    },
+    {
+      "dependency": "snmpbulkwalk",
+      "suggestion": "请安装适用于当前 Windows 终端的 Net-SNMP 命令行工具，并将包含 SNMP 命令的目录加入当前终端的 PATH。",
+      "platform": "windows-amd64"
+    },
+    {
+      "dependency": "snmpbulkget",
+      "suggestion": "请安装适用于当前 Windows 终端的 Net-SNMP 命令行工具，并将包含 SNMP 命令的目录加入当前终端的 PATH。",
+      "platform": "windows-amd64"
+    },
+    {
+      "dependency": "snmpset",
+      "suggestion": "请安装适用于当前 Windows 终端的 Net-SNMP 命令行工具，并将包含 SNMP 命令的目录加入当前终端的 PATH。",
+      "platform": "windows-amd64"
+    }
+  ]
+}

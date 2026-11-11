@@ -16,7 +16,9 @@
   ],
   "help": "help.json",
   "changelog": "changelog.json",
+  "repairSuggestions": "repair.json",
   "assets": [
+    "repair.json",
     "tool/compat/common.sh",
     "tool/compat/snmp.sh"
   ],
