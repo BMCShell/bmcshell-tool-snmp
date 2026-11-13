@@ -56,7 +56,7 @@ _bmcshell_v2tools_snmp_setup() {
     if [[ $action == -r || $action == --clear ]]; then
         (( $# == 3 )) || { builtin printf '用法：snmp -r\n' >&2; return 2; }
         builtin unset '_BMCSHELL_SESSION_STATE[v2.snmp_version]' '_BMCSHELL_SESSION_STATE[v2.snmp_community]'
-        builtin printf '已清除当前会话的 SNMP 团体名，默认版本恢复为 2c。\n'
+        builtin printf '已清除当前会话的 SNMP 团体名和版本覆盖。\n'
         return 0
     fi
     if (( $# > 4 )) || [[ $version != 1 && $version != 2c ]]; then
@@ -126,7 +126,11 @@ _bmcshell_v2tools_run() (
             _bmc_tool_bssh "$@" ;;
         snmp|snmpget|snmpgetnext|snmpwalk|snmpbulkwalk|snmpbulkget|snmpset|snmp2get|snmp2getnext|snmp2walk|snmp2bulkwalk|snmp2bulkget|snmp2set|snmp3get|snmp3getnext|snmp3walk|snmp3bulkwalk|snmp3bulkget|snmp3set)
             builtin source "$_BMC_INSTALL_DIR/compat/snmp.sh" || return
-            local _BMC_SNMP_VERSION=${_BMCSHELL_SESSION_STATE[v2.snmp_version]:-2c}
+            local _BMC_SNMP_VERSION=${_BMCSHELL_SESSION_STATE[v2.snmp_version]:-${BMCSHELL_SNMP_VERSION:-2c}}
+            case $_BMC_SNMP_VERSION in
+                1|2c|3) ;;
+                *) _BMC_SNMP_VERSION=2c ;;
+            esac
             local +x _BMC_SNMP_COMMUNITY=${_BMCSHELL_SESSION_STATE[v2.snmp_community]-}
             if [[ $tool == snmp ]]; then _bmc_snmp_command "$@"
             else "_bmc_tool_$tool" "$@"; fi ;;

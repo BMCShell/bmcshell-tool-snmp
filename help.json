@@ -14,7 +14,8 @@
         }
       ],
       "notes": [
-        "需要 PATH 中的对应 Net-SNMP 命令。代理由 bmc proxy 管理。"
+        "需要 PATH 中的对应 Net-SNMP 命令。代理由 bmc proxy 管理。",
+        "普通 SNMP 命令可继承设置中心的默认版本。会话设置和显式 -v 优先。"
       ]
     },
     "tool.snmp": {
@@ -37,7 +38,7 @@
         },
         {
           "name": "-r, --clear",
-          "description": "清除会话团体名，恢复默认版本 2c。"
+          "description": "清除会话团体名和版本覆盖，重新使用框架默认版本。"
         }
       ],
       "examples": [
